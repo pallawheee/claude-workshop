@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alex Rivera — Developer & Designer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0f;
+      --surface: #16161a;
+      --border: #2a2a35;
+      --accent: #7c6af7;
+      --accent2: #e879a0;
+      --text: #e8e8f0;
+      --muted: #8888a0;
+      --radius: 14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Noise texture overlay ── */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Gradient blobs ── */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 { width: 600px; height: 600px; background: var(--accent); top: -200px; left: -200px; }
+    .blob-2 { width: 500px; height: 500px; background: var(--accent2); bottom: -150px; right: -150px; }
+
+    /* ── Layout ── */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(13,13,15,0.7);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 28px;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--text); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto 28px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      box-shadow: 0 0 0 4px var(--surface), 0 0 0 6px var(--border);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(124,106,247,0.12);
+      border: 1px solid rgba(124,106,247,0.3);
+      color: #a89ff9;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 99px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .badge-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #6deba3;
+      box-shadow: 0 0 6px #6deba3;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    h1 .gradient {
+      background: linear-gradient(135deg, var(--accent) 30%, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      color: var(--muted);
+      font-size: 1.1rem;
+      max-width: 500px;
+      margin: 0 auto 36px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 26px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,106,247,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,106,247,0.45); }
+    .btn-ghost {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Section headings ── */
+    section { padding: 64px 0; }
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--border), transparent);
+    }
+    h2 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 40px;
+    }
+
+    /* ── About ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) { .about-grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .card-icon { font-size: 1.8rem; margin-bottom: 12px; }
+    .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .card p { font-size: 0.875rem; color: var(--muted); }
+
+    /* ── Skills ── */
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .skill-tag {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Projects ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 640px) { .projects-grid { grid-template-columns: 1fr; } }
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .project-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(124,106,247,0.06), transparent);
+      pointer-events: none;
+    }
+    .project-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .project-icon { font-size: 1.5rem; }
+    .project-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.2s;
+    }
+    .project-link:hover { color: var(--accent); }
+    .project-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .project-card p { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      background: rgba(124,106,247,0.1);
+      color: #a89ff9;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Contact ── */
+    .contact-wrapper {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 48px;
+      text-align: center;
+    }
+    @media (max-width: 500px) { .contact-wrapper { padding: 32px 20px; } }
+    .contact-wrapper h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+    .contact-wrapper p { color: var(--muted); margin-bottom: 28px; }
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .social-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+  <!-- Background blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container">
+      <span class="logo">Alex Rivera</span>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="avatar">👨‍💻</div>
+      <div class="badge"><span class="badge-dot"></span> Open to opportunities</div>
+      <h1>Hi, I'm Alex.<br><span class="gradient">I build things for the web.</span></h1>
+      <p class="hero-sub">Full-stack developer &amp; designer who loves crafting fast, accessible, and beautiful digital experiences.</p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          View Projects
+        </a>
+        <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <div class="container">
+      <div class="section-label">About</div>
+      <h2>A bit about me</h2>
+      <div class="about-grid">
+        <div class="card">
+          <div class="card-icon">🚀</div>
+          <h3>Builder at heart</h3>
+          <p>I've been writing code since I was 14. There's nothing more satisfying than turning a rough idea into a polished product that people love using.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🎨</div>
+          <h3>Design matters</h3>
+          <p>Good code isn't enough. I care deeply about UI/UX, accessibility, and performance — because the best product is one that actually gets used.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🌍</div>
+          <h3>Remote-first</h3>
+          <p>Based in San Francisco, working with teams across multiple time zones. I love async communication and strong documentation culture.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📚</div>
+          <h3>Lifelong learner</h3>
+          <p>Currently exploring AI/ML, WebAssembly, and edge computing. I write about what I learn and share everything in the open.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section id="skills">
+    <div class="container">
+      <div class="section-label">Skills</div>
+      <h2>What I work with</h2>
+      <div class="skills-grid">
+        <span class="skill-tag">TypeScript</span>
+        <span class="skill-tag">React</span>
+        <span class="skill-tag">Next.js</span>
+        <span class="skill-tag">Node.js</span>
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">PostgreSQL</span>
+        <span class="skill-tag">GraphQL</span>
+        <span class="skill-tag">Docker</span>
+        <span class="skill-tag">Kubernetes</span>
+        <span class="skill-tag">AWS</span>
+        <span class="skill-tag">Figma</span>
+        <span class="skill-tag">Tailwind CSS</span>
+        <span class="skill-tag">Rust</span>
+        <span class="skill-tag">WebAssembly</span>
+        <span class="skill-tag">Redis</span>
+        <span class="skill-tag">Terraform</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects">
+    <div class="container">
+      <div class="section-label">Projects</div>
+      <h2>Things I've built</h2>
+      <div class="projects-grid">
+
+        <div class="project-card">
+          <div class="project-header">
+            <div class="project-icon">⚡</div>
+            <a href="#" class="project-link" title="View project">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+          <h3>Veloce — API Gateway</h3>
+          <p>A high-performance edge API gateway built with Rust and WebAssembly. Handles 1M+ req/s with sub-millisecond latency.</p>
+          <div class="tags">
+            <span class="tag">Rust</span>
+            <span class="tag">WASM</span>
+            <span class="tag">Edge</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-header">
+            <div class="project-icon">🧠</div>
+            <a href="#" class="project-link" title="View project">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+          <h3>Synapse — AI Notebook</h3>
+          <p>A collaborative AI-powered notebook for teams. Real-time sync, version history, and LLM-assisted writing built on top of CRDTs.</p>
+          <div class="tags">
+            <span class="tag">Next.js</span>
+            <span class="tag">AI</span>
+            <span class="tag">CRDTs</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-header">
+            <div class="project-icon">📊</div>
+            <a href="#" class="project-link" title="View project">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+          <h3>Axiom — Analytics SDK</h3>
+          <p>Privacy-first analytics SDK with a React dashboard. No cookies, no fingerprinting. GDPR-compliant out of the box.</p>
+          <div class="tags">
+            <span class="tag">TypeScript</span>
+            <span class="tag">React</span>
+            <span class="tag">Privacy</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-header">
+            <div class="project-icon">🔐</div>
+            <a href="#" class="project-link" title="View project">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+          <h3>Keychain — Auth Library</h3>
+          <p>Zero-dependency authentication library for Node.js. Passkey, OAuth2, magic links — with a single unified API.</p>
+          <div class="tags">
+            <span class="tag">Node.js</span>
+            <span class="tag">Security</span>
+            <span class="tag">OAuth2</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="container">
+      <div class="section-label">Contact</div>
+      <div class="contact-wrapper">
+        <h3>Let's work together</h3>
+        <p>Have a project in mind or just want to chat? My inbox is always open.</p>
+        <a href="mailto:alex@example.com" class="btn btn-primary" style="margin-bottom:28px; display:inline-flex;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Say Hello
+        </a>
+        <div class="social-links">
+          <a href="#" class="social-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            GitHub
+          </a>
+          <a href="#" class="social-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            LinkedIn
+          </a>
+          <a href="#" class="social-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+            Twitter / X
+          </a>
+          <a href="#" class="social-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            Blog
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>Designed &amp; built by Alex Rivera · 2026 · Made with ♥ and way too much coffee</p>
+    </div>
+  </footer>
+
+</body>
+</html>
