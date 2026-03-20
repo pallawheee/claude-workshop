@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>India Deeptech Research Intelligence — UIV</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f8ff;
+      --surface: #ffffff;
+      --surface2: #eef3ff;
+      --border: #dde5f7;
+      --accent: #0D1B4B;
+      --gold: #C9A84C;
+      --gold-light: #f0d89a;
+      --accent-blue: #1d4ed8;
+      --accent2: #60a5fa;
+      --text: #0f172a;
+      --muted: #64748b;
+      --radius: 14px;
+      --active: #16a34a;
+      --pending: #94a3b8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      background-image: radial-gradient(circle, #c7d7f8 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      background: rgba(13, 27, 75, 0.96);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.3);
+    }
+    nav .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 58px;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo {
+      font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--gold);
+    }
+    .nav-divider { width: 1px; height: 18px; background: rgba(201, 168, 76, 0.3); }
+    .nav-title { font-size: 0.8rem; color: rgba(255,255,255,0.75); font-weight: 500; }
+    nav ul { list-style: none; display: flex; gap: 4px; }
+    nav a.tab-link {
+      color: rgba(255,255,255,0.6); text-decoration: none;
+      font-size: 0.8rem; font-weight: 600;
+      padding: 6px 14px; border-radius: 8px;
+      transition: all 0.18s; cursor: pointer;
+      border: 1px solid transparent;
+    }
+    nav a.tab-link:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    nav a.tab-link.active { color: var(--gold); background: rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.3); }
+
+    /* ── Layout ── */
+    .page { display: none; }
+    .page.active { display: block; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Page header ── */
+    .page-header {
+      padding: 44px 0 32px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 36px;
+    }
+    .page-label {
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
+    }
+    .page-header h1 {
+      font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 900;
+      letter-spacing: -0.04em; color: var(--text);
+      margin-bottom: 8px;
+    }
+    .page-header p { color: var(--muted); font-size: 0.9rem; max-width: 560px; }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 36px;
+    }
+    .stat-chip {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 14px 20px;
+      display: flex; flex-direction: column; gap: 2px;
+      min-width: 120px;
+    }
+    .stat-value { font-size: 1.4rem; font-weight: 900; color: var(--accent); letter-spacing: -0.04em; }
+    .stat-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ═══════════════════════════════
+       SECTORS PAGE — bubble grid
+    ═══════════════════════════════ */
+    .sectors-wrap { display: flex; flex-direction: column; gap: 32px; }
+
+    /* Domain bubble clusters */
+    .domain-section { }
+    .domain-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    }
+    .domain-name {
+      font-size: 0.9rem; font-weight: 800; color: var(--text);
+    }
+    .domain-count {
+      font-size: 0.72rem; font-weight: 700; color: var(--muted);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2px 10px;
+    }
+    .bubble-row {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    }
+    .bubble {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 0.82rem; font-weight: 700;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      cursor: default;
+    }
+    .bubble.covered {
+      background: rgba(13, 27, 75, 0.07);
+      border-color: rgba(13, 27, 75, 0.2);
+      color: var(--accent);
+    }
+    .bubble.covered:hover {
+      background: rgba(13, 27, 75, 0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(13, 27, 75, 0.12);
+    }
+    .bubble.pending {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--pending);
+    }
+    .bubble-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .bubble.covered .bubble-dot { background: var(--gold); }
+    .bubble.pending .bubble-dot { background: var(--pending); }
+
+    /* Institute grid cards */
+    .institute-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .institute-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: all 0.22s;
+      position: relative;
+      overflow: hidden;
+    }
+    .institute-card::before {
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--gold));
+      opacity: 0; transition: opacity 0.22s;
+    }
+    .institute-card:hover::before { opacity: 1; }
+    .institute-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(13, 27, 75, 0.1);
+    }
+    .institute-card.pending-card { opacity: 0.65; }
+    .inst-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .inst-code {
+      font-size: 0.65rem; font-weight: 900; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--gold);
+      background: rgba(201, 168, 76, 0.1); border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 6px; padding: 3px 8px;
+    }
+    .inst-status {
+      font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; border-radius: 20px; padding: 3px 10px;
+    }
+    .inst-status.active { color: var(--active); background: rgba(22,163,74,0.1); }
+    .inst-status.pending { color: var(--pending); background: rgba(148,163,184,0.12); }
+    .inst-name { font-size: 0.95rem; font-weight: 800; color: var(--text); margin-bottom: 3px; }
+    .inst-type { font-size: 0.75rem; color: var(--muted); margin-bottom: 10px; }
+    .inst-location { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; color: var(--muted); margin-bottom: 12px; }
+    .inst-domains {
+      font-size: 0.72rem; color: var(--muted); line-height: 1.6;
+      border-top: 1px solid var(--border); padding-top: 10px; margin-top: 6px;
+    }
+    .inst-stats { display: flex; gap: 16px; margin-bottom: 12px; }
+    .inst-stat { display: flex; flex-direction: column; gap: 1px; }
+    .inst-stat-val { font-size: 1rem; font-weight: 900; color: var(--accent-blue); }
+    .inst-stat-lbl { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; color: var(--muted); letter-spacing: 0.06em; }
+
+    /* ═══════════════════════════════
+       RESEARCH PAGE
+    ═══════════════════════════════ */
+    .filter-bar {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; align-items: center;
+    }
+    .filter-input {
+      flex: 1; min-width: 220px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 10px 16px;
+      font-size: 0.84rem; color: var(--text);
+      outline: none; transition: border-color 0.18s;
+    }
+    .filter-input:focus { border-color: var(--accent-blue); }
+    .filter-select {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 10px 14px;
+      font-size: 0.82rem; color: var(--text);
+      outline: none; cursor: pointer; transition: border-color 0.18s;
+    }
+    .filter-select:focus { border-color: var(--accent-blue); }
+
+    .papers-list { display: flex; flex-direction: column; gap: 12px; }
+    .paper-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 22px 24px;
+      transition: all 0.2s; position: relative;
+    }
+    .paper-card:hover {
+      border-color: var(--accent2);
+      box-shadow: 0 6px 24px rgba(29, 78, 216, 0.08);
+    }
+    .paper-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .paper-tag {
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+      border-radius: 6px; padding: 3px 9px;
+    }
+    .paper-tag.institute { background: rgba(13,27,75,0.07); color: var(--accent); }
+    .paper-tag.domain { background: rgba(201,168,76,0.1); color: #92681c; }
+    .paper-tag.year { background: var(--surface2); color: var(--muted); }
+    .paper-title {
+      font-size: 0.95rem; font-weight: 800; color: var(--text);
+      margin-bottom: 5px; line-height: 1.45;
+    }
+    .paper-title a { color: inherit; text-decoration: none; }
+    .paper-title a:hover { color: var(--accent-blue); text-decoration: underline; }
+    .paper-authors { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; }
+    .paper-venue { font-size: 0.78rem; color: var(--muted); font-style: italic; margin-bottom: 10px; }
+    .paper-abstract {
+      font-size: 0.82rem; color: var(--muted); line-height: 1.7;
+      border-top: 1px solid var(--border); padding-top: 10px;
+    }
+    .paper-relevance {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-top: 10px; font-size: 0.72rem; font-weight: 700;
+      color: var(--active); background: rgba(22,163,74,0.08);
+      border-radius: 6px; padding: 3px 10px;
+    }
+    .no-results {
+      text-align: center; padding: 60px 0;
+      color: var(--muted); font-size: 0.9rem;
+    }
+
+    /* ═══════════════════════════════
+       GRANTS PAGE
+    ═══════════════════════════════ */
+    .grants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+    @media (max-width: 720px) { .grants-grid { grid-template-columns: 1fr; } }
+    .grant-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 22px;
+      transition: all 0.2s; display: flex; flex-direction: column; gap: 12px;
+      position: relative; overflow: hidden;
+    }
+    .grant-card::after {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--accent), var(--gold));
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .grant-card:hover::after { opacity: 1; }
+    .grant-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 8px 24px rgba(13, 27, 75, 0.08);
+    }
+    .grant-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .grant-name { font-size: 0.92rem; font-weight: 800; color: var(--text); line-height: 1.4; }
+    .grant-badge {
+      flex-shrink: 0; font-size: 0.65rem; font-weight: 800;
+      border-radius: 6px; padding: 3px 9px;
+      background: rgba(13,27,75,0.07); color: var(--accent);
+      white-space: nowrap;
+    }
+    .grant-body { font-size: 0.8rem; color: var(--muted); line-height: 1.6; display: flex; flex-direction: column; gap: 7px; }
+    .grant-row { display: flex; gap: 8px; align-items: flex-start; }
+    .grant-row-label { font-weight: 700; color: var(--text); min-width: 80px; flex-shrink: 0; font-size: 0.75rem; }
+    .grant-amount {
+      font-size: 1rem; font-weight: 900; color: var(--accent-blue);
+      letter-spacing: -0.02em;
+    }
+    .grant-deadline {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.72rem; font-weight: 700;
+      background: rgba(201,168,76,0.1); color: #92681c;
+      border-radius: 6px; padding: 4px 10px;
+      border: 1px solid rgba(201,168,76,0.25);
+    }
+    .grant-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.78rem; font-weight: 700;
+      color: var(--accent-blue); text-decoration: none;
+      transition: opacity 0.18s;
+    }
+    .grant-link:hover { opacity: 0.7; text-decoration: underline; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border); padding: 24px 0;
+      text-align: center; color: var(--muted); font-size: 0.75rem;
+      margin-top: 60px;
+    }
+
+    @media (max-width: 600px) {
+      .institute-grid { grid-template-columns: 1fr; }
+      .stats-bar { gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <span class="nav-logo">UIV</span>
+      <span class="nav-divider"></span>
+      <span class="nav-title">India Deeptech Intelligence</span>
+    </a>
+    <ul>
+      <li><a class="tab-link active" onclick="showTab('sectors')">Sectors</a></li>
+      <li><a class="tab-link" onclick="showTab('research')">Research</a></li>
+      <li><a class="tab-link" onclick="showTab('grants')">Grants</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══ SECTORS PAGE ═══ -->
+<div id="page-sectors" class="page active">
+  <div class="container">
+    <div class="page-header">
+      <div class="page-label">Sector Coverage</div>
+      <h1>India Deeptech Sectors</h1>
+      <p>Domain coverage across 11 research institutes, IITs, national labs, and defence/space agencies tracked by UIV.</p>
+    </div>
+
+    <div class="stats-bar" id="stats-bar"></div>
+
+    <!-- Domain bubble clusters -->
+    <div class="sectors-wrap" id="domain-clusters"></div>
+
+    <!-- Institute cards -->
+    <div style="margin-top:48px;">
+      <div class="page-label" style="margin-bottom:16px;">All Institutes</div>
+      <div class="institute-grid" id="institute-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RESEARCH PAGE ═══ -->
+<div id="page-research" class="page">
+  <div class="container">
+    <div class="page-header">
+      <div class="page-label">Research Papers</div>
+      <h1>Publications & Preprints</h1>
+      <p>Peer-reviewed research from IIT Madras, CSIR, and partner institutes — curated for deeptech relevance.</p>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" class="filter-input" id="paper-search" placeholder="Search by title, author, or keyword..." oninput="filterPapers()" />
+      <select class="filter-select" id="paper-institute" onchange="filterPapers()">
+        <option value="">All Institutes</option>
+        <option value="IIT Madras">IIT Madras</option>
+        <option value="CSIR">CSIR</option>
+      </select>
+      <select class="filter-select" id="paper-domain" onchange="filterPapers()">
+        <option value="">All Domains</option>
+      </select>
+    </div>
+
+    <div class="papers-list" id="papers-list"></div>
+  </div>
+</div>
+
+<!-- ═══ GRANTS PAGE ═══ -->
+<div id="page-grants" class="page">
+  <div class="container">
+    <div class="page-header">
+      <div class="page-label">Funding & Grants</div>
+      <h1>Active Grant Schemes</h1>
+      <p>Government and institutional funding schemes for deeptech research, startups, and academia — curated for UIV's portfolio focus.</p>
+    </div>
+
+    <div class="filter-bar">
+      <select class="filter-select" id="grant-institute" onchange="filterGrants()">
+        <option value="">All Sources</option>
+        <option value="IIT Madras">IIT Madras / National</option>
+        <option value="CSIR">CSIR</option>
+      </select>
+    </div>
+
+    <div class="grants-grid" id="grants-grid"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    UIV India Deeptech Research Intelligence · <a href="index.html" style="color:inherit">pallavi.nb</a> · 2026
+  </div>
+</footer>
+
+<script>
+const DATA = {"institutes": [{"id": 1, "name": "IIT Madras", "code": "IITM", "file": "IIT_Madras.xlsx", "type": "IIT", "location": "Chennai, TN", "domains": "AI, Aerospace, Quantum, Biotech, Energy", "papers": 5, "spinoffs": 6, "grants": 5, "status": "Active"}, {"id": 2, "name": "CSIR", "code": "CSIR", "file": "CSIR.xlsx", "type": "National Lab Network", "location": "Pan-India (37 labs)", "domains": "Pharma, Materials, Genomics, Aerospace, Chemicals", "papers": 5, "spinoffs": 4, "grants": 5, "status": "Active"}, {"id": 3, "name": "IIT Bombay", "code": "IITB", "file": "IIT_Bombay.xlsx", "type": "IIT", "location": "Mumbai, MH", "domains": "Fintech, AI, Photonics, Nano, Manufacturing", "papers": 0, "spinoffs": 0, "grants": 0, "status": "Pending"}, {"id": 4, "name": "IIT Delhi", "code": "IITD", "file": "IIT_Delhi.xlsx", "type": "IIT", "location": "New Delhi", "domains": "Policy-Tech, AI, Textiles, Smart Cities, Health", "papers": 0, "spinoffs": 0, "grants": 0, "status": "Pending"}, {"id": 5, "name": "IIT Hyderabad", "code": "IITH", "file": "IIT_Hyderabad.xlsx", "type": "IIT", "location": "Hyderabad, TS", "domains": "AI/ML, Pharma, Semiconductors, EVs", "papers": 0, "spinoffs": 0, "grants": 0, "status": "Pending"}, {"id": 6, "name": "IIT Kharagpur", "code": "IITKgp", "file": "IIT_Kharagpur.xlsx", "type": "IIT", "location": "Kharagpur, WB", "domains": "Mining, Agriculture-Tech, Railways, AI, Cyber", "papers": 0, "spinoffs": 0, "grants": 0, "status": "Pending"}, {"id": 7, "name": "IISc", "code": "IISc", "file": "IISc.xlsx", "type": "Research University", "location": "Bengaluru, KA", "domains": "Aerospace, Materials, Quantum, Biotech, AI", "papers": 0, "spinoffs": 0, "grants": 0, "status": "Pending"}, {"id": 8, "name": "DRDO", "code": "DRDO", "file": "DRDO.xlsx", "type": "Defence R&D", "location": "Pan-India (50+ labs)", "domains": "Defence Systems, Missiles, Electronics, Materials, Cyber", "papers": 0, "spinoffs": 0, "grants": 0, "status": "Pending"}, {"id": 9, "name": "ISRO", "code": "ISRO", "file": "ISRO.xlsx", "type": "Space Agency", "location": "Bengaluru (HQ) + centres", "domains": "Launch, Satellites, Earth Obs, Quantum Comms", "papers": 0, "spinoffs": 0, "grants": 0, "status": "Pending"}, {"id": 10, "name": "NRDC", "code": "NRDC", "file": "NRDC.xlsx", "type": "Technology Transfer Organisation", "location": "New Delhi", "domains": "IP Licensing, Technology Commercialisation (all sectors)", "papers": 0, "spinoffs": 0, "grants": 0, "status": "Pending"}, {"id": 11, "name": "BARC", "code": "BARC", "file": "BARC.xlsx", "type": "Nuclear R&D", "location": "Mumbai, MH", "domains": "Nuclear Energy, Radiation Tech, Isotopes, Materials", "papers": 0, "spinoffs": 0, "grants": 0, "status": "Pending"}], "domain_matrix": [{"domain": "AI / ML", "coverage": {"IITM": true, "CSIR": false, "IITB": true, "IITD": true, "IITH": true, "IITKgp": true, "IISc": false, "DRDO": false, "ISRO": false, "NRDC": true, "BARC": false}}, {"domain": "Aerospace", "coverage": {"IITM": true, "CSIR": false, "IITB": false, "IITD": false, "IITH": false, "IITKgp": false, "IISc": true, "DRDO": true, "ISRO": true, "NRDC": false, "BARC": false}}, {"domain": "Quantum", "coverage": {"IITM": true, "CSIR": false, "IITB": false, "IITD": false, "IITH": false, "IITKgp": false, "IISc": true, "DRDO": false, "ISRO": true, "NRDC": false, "BARC": false}}, {"domain": "Biotech / Health", "coverage": {"IITM": true, "CSIR": true, "IITB": false, "IITD": true, "IITH": false, "IITKgp": false, "IISc": true, "DRDO": false, "ISRO": false, "NRDC": true, "BARC": false}}, {"domain": "Clean Energy", "coverage": {"IITM": true, "CSIR": true, "IITB": false, "IITD": false, "IITH": false, "IITKgp": false, "IISc": false, "DRDO": false, "ISRO": false, "NRDC": true, "BARC": false}}, {"domain": "Semiconductors", "coverage": {"IITM": true, "CSIR": false, "IITB": true, "IITD": false, "IITH": true, "IITKgp": false, "IISc": false, "DRDO": false, "ISRO": false, "NRDC": false, "BARC": false}}, {"domain": "Robotics", "coverage": {"IITM": true, "CSIR": false, "IITB": false, "IITD": false, "IITH": false, "IITKgp": false, "IISc": false, "DRDO": false, "ISRO": false, "NRDC": false, "BARC": false}}, {"domain": "Defence / Dual-Use", "coverage": {"IITM": false, "CSIR": true, "IITB": false, "IITD": false, "IITH": false, "IITKgp": false, "IISc": false, "DRDO": true, "ISRO": false, "NRDC": false, "BARC": true}}, {"domain": "Pharmaceuticals", "coverage": {"IITM": false, "CSIR": true, "IITB": false, "IITD": false, "IITH": true, "IITKgp": false, "IISc": false, "DRDO": false, "ISRO": false, "NRDC": false, "BARC": false}}, {"domain": "Advanced Materials", "coverage": {"IITM": false, "CSIR": true, "IITB": true, "IITD": false, "IITH": false, "IITKgp": true, "IISc": true, "DRDO": true, "ISRO": false, "NRDC": false, "BARC": true}}, {"domain": "Space", "coverage": {"IITM": false, "CSIR": false, "IITB": false, "IITD": false, "IITH": false, "IITKgp": false, "IISc": false, "DRDO": false, "ISRO": true, "NRDC": false, "BARC": false}}, {"domain": "Nuclear", "coverage": {"IITM": false, "CSIR": false, "IITB": false, "IITD": false, "IITH": false, "IITKgp": false, "IISc": false, "DRDO": false, "ISRO": false, "NRDC": false, "BARC": true}}, {"domain": "Cyber", "coverage": {"IITM": false, "CSIR": false, "IITB": false, "IITD": true, "IITH": false, "IITKgp": true, "IISc": false, "DRDO": true, "ISRO": false, "NRDC": false, "BARC": false}}], "papers": [{"title": "Deep Reinforcement Learning for Autonomous UAV Navigation in GPS-Denied Environments", "authors": "Suresh Kumar, Priya Nair, Anand Rajan", "year": 2023, "venue": "IEEE Transactions on Aerospace and Electronic Systems", "domain": "AI / Autonomous Systems", "url": "https://doi.org/10.1109/TAES.2023.001", "abstract": "Presents a DRL framework enabling UAVs to navigate complex indoor environments without GPS using LiDAR and camera fusion.", "relevance": "High \u2014 Defence autonomy stack", "institute": "IIT Madras"}, {"title": "Perovskite Solar Cells with >24% Efficiency via Interface Engineering", "authors": "Meera Pillai, Karthik Subramaniam", "year": 2023, "venue": "Nature Energy", "domain": "Clean Energy / Semiconductors", "url": "https://doi.org/10.1038/s41560-023-001", "abstract": "Interface passivation technique that suppresses non-radiative recombination, pushing certified PCE to 24.3%.", "relevance": "Medium \u2014 Energy materials supply chain", "institute": "IIT Madras"}, {"title": "Federated Learning on Heterogeneous IoT Devices for Predictive Maintenance", "authors": "Raj Mohan, Divya Krishnan, Sanjay Patel", "year": 2024, "venue": "ACM MobiSys", "domain": "AI / IoT", "url": "https://doi.org/10.1145/mobisys.2024.001", "abstract": "A communication-efficient FL protocol that handles non-IID data across resource-constrained edge devices with <5% accuracy loss.", "relevance": "High \u2014 Smart infrastructure monitoring", "institute": "IIT Madras"}, {"title": "Quantum Key Distribution Over 100 km Fibre Using Continuous-Variable Protocol", "authors": "Vikram Chandrasekaran, Nandini Rao", "year": 2024, "venue": "Physical Review Applied", "domain": "Quantum Computing / Cybersecurity", "url": "https://doi.org/10.1103/PhysRevApplied.2024.001", "abstract": "Demonstrates CV-QKD with secret key rate of 1.2 Mbps over 100 km standard SMF fibre at room temperature.", "relevance": "High \u2014 Secure comms for critical infra", "institute": "IIT Madras"}, {"title": "Bioinspired Soft Robotic Gripper for Delicate Object Manipulation", "authors": "Arun Natarajan, Preethi Balaji", "year": 2023, "venue": "Science Robotics", "domain": "Robotics / Manufacturing", "url": "https://doi.org/10.1126/scirobotics.2023.001", "abstract": "Pneumatically actuated gripper with gecko-inspired adhesion achieving 98% success on irregular fragile objects.", "relevance": "Medium \u2014 Advanced manufacturing", "institute": "IIT Madras"}, {"title": "Genomic Surveillance of SARS-CoV-2 Variants Circulating in India: 2020\u20132023", "authors": "Vinod Scaria, Anurag Agrawal et al.", "year": 2023, "venue": "The Lancet Regional Health \u2014 Southeast Asia", "domain": "Genomics / Public Health", "url": "https://doi.org/10.1016/j.lansea.2023.001", "abstract": "Nationwide WGS of 45,000+ samples revealing lineage dynamics, immune escape mutations and forecasting utility.", "relevance": "High \u2014 BioSurveillance & National Security", "institute": "CSIR"}, {"title": "Solid-State Hydrogen Storage Using MOF-Derived Carbon-Boron Nanocomposites", "authors": "Rajat Bhattacharyya, Suman Mukhopadhyay", "year": 2024, "venue": "Advanced Energy Materials", "domain": "Clean Energy / Materials", "url": "https://doi.org/10.1002/aenm.2024.001", "abstract": "MOF-templated synthesis achieves 7.2 wt% H\u2082 storage at room temperature \u2014 record for ambient-condition operation.", "relevance": "High \u2014 Green hydrogen economy", "institute": "CSIR"}, {"title": "CSIR-CDRI Anti-Malarial Drug Arterolane: Clinical Trials and Deployment", "authors": "S. Puri, A. K. Dwivedi et al.", "year": 2023, "venue": "PLOS Medicine", "domain": "Drug Discovery / Global Health", "url": "https://doi.org/10.1371/journal.pmed.2023.001", "abstract": "Phase-III data for arterolane maleate-piperaquine combination showing 97% parasite clearance in P. falciparum malaria.", "relevance": "Medium \u2014 Strategic health infrastructure", "institute": "CSIR"}, {"title": "High-Entropy Alloys for Hypersonic Thermal Protection Structures", "authors": "K. Biswas, R. Mitra, S. Suwas", "year": 2024, "venue": "Acta Materialia", "domain": "Advanced Materials / Aerospace", "url": "https://doi.org/10.1016/j.actamat.2024.001", "abstract": "Novel TiZrHfNbTa HEA retains 95% yield strength at 1200\u00b0C and shows superior oxidation resistance vs Inconel 718.", "relevance": "High \u2014 Defence / hypersonic systems", "institute": "CSIR"}, {"title": "ML-Guided Discovery of Lead Compounds Against Drug-Resistant Tuberculosis", "authors": "P. Yogeeswari, D. Sriram, M. Kalia", "year": 2023, "venue": "Journal of Medicinal Chemistry", "domain": "AI / Drug Discovery", "url": "https://doi.org/10.1021/acs.jmedchem.2023.001", "abstract": "Graph neural network trained on CSIR compound library identifies 14 novel InhA inhibitors with sub-100 nM MIC against MDR-TB.", "relevance": "High \u2014 Dual-use pharma capability", "institute": "CSIR"}], "spinoffs": [], "grants": [{"name": "IITM Research Park Deeptech Fellowship", "body": "IIT Madras Research Park / Industry Partners", "amount": "INR 50,000/month + lab access", "eligibility": "PhD students & post-docs in IITM deeptech labs", "deadline": "Rolling", "url": "https://www.iitmrp.in", "institute": "IIT Madras"}, {"name": "SERB \u2014 Core Research Grant (CRG)", "body": "Science & Engineering Research Board (DST)", "amount": "INR 30\u201380 Lakh (3 years)", "eligibility": "Faculty at recognized Indian institutions; PhD + 2 years post-doctoral", "deadline": "Mar & Sep annually", "url": "https://serb.gov.in/page/english/core_research_grant", "institute": "IIT Madras"}, {"name": "DRDO \u2014 Technology Development Fund (TDF)", "body": "DRDO / Ministry of Defence", "amount": "Up to INR 50 Crore", "eligibility": "Indian startups & academia for defence-applicable tech", "deadline": "Rolling", "url": "https://tdf.drdo.gov.in", "institute": "IIT Madras"}, {"name": "DST \u2014 National Quantum Mission (NQM) Grant", "body": "Department of Science & Technology", "amount": "INR 6000 Crore (national pool, 2023\u20132031)", "eligibility": "Indian academic institutions and deeptech companies", "deadline": "Mission calls issued quarterly", "url": "https://dst.gov.in/quantum-mission", "institute": "IIT Madras"}, {"name": "ISRO \u2014 Respond Programme", "body": "Indian Space Research Organisation", "amount": "INR 20\u2013100 Lakh per project", "eligibility": "Faculty & PG students at Indian universities for space-related R&D", "deadline": "Rolling", "url": "https://www.isro.gov.in/respond", "institute": "IIT Madras"}, {"name": "CSIR-NMITLI (New Millennium Indian Technology Leadership Initiative)", "body": "CSIR", "amount": "INR 10\u2013150 Crore per programme", "eligibility": "Industry-academia consortia on mission-mode national programmes", "deadline": "Call-based; ~2 calls/year", "url": "https://www.csir.res.in/nmitli", "institute": "CSIR"}, {"name": "CSIR-800 Mission", "body": "CSIR", "amount": "INR 5\u201320 Lakh seed + scaling support", "eligibility": "Innovations addressing needs of India's bottom 800 million", "deadline": "Rolling", "url": "https://www.csir.res.in/csir-800", "institute": "CSIR"}, {"name": "CSIR Flex Time Technology (FTT)", "body": "CSIR", "amount": "Lab resources + INR 2\u20135 Lakh", "eligibility": "CSIR scientists for exploratory pre-competitive research", "deadline": "Rolling (internal)", "url": "https://www.csir.res.in/ftt", "institute": "CSIR"}, {"name": "STRAIT (Startup & Technology Absorption & Innovation)", "body": "CSIR / NRDC", "amount": "Up to INR 2 Crore", "eligibility": "Indian startups licensing CSIR IP for commercialisation", "deadline": "Rolling", "url": "https://nrdc.in/strait", "institute": "CSIR"}, {"name": "DST \u2014 SERB TARE (Teacher-Associate Research)", "body": "SERB / DST", "amount": "INR 15 Lakh/year (3 years)", "eligibility": "College teachers to work in CSIR labs; PhD required", "deadline": "Sep annually", "url": "https://serb.gov.in/page/english/tare", "institute": "CSIR"}]};
+
+/* ── Tab switching ── */
+function showTab(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-link').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* ═══ SECTORS ═══ */
+function renderSectors() {
+  // Stats bar
+  const active = DATA.institutes.filter(i => i.status === 'Active').length;
+  const totalPapers = DATA.papers.length;
+  const totalGrants = DATA.grants.length;
+  const domainCount = DATA.domain_matrix.length;
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat-chip"><div class="stat-value">${DATA.institutes.length}</div><div class="stat-label">Institutes</div></div>
+    <div class="stat-chip"><div class="stat-value">${active}</div><div class="stat-label">Active</div></div>
+    <div class="stat-chip"><div class="stat-value">${domainCount}</div><div class="stat-label">Domains</div></div>
+    <div class="stat-chip"><div class="stat-value">${totalPapers}</div><div class="stat-label">Papers</div></div>
+    <div class="stat-chip"><div class="stat-value">${totalGrants}</div><div class="stat-label">Grants</div></div>
+  `;
+
+  // Domain clusters
+  const clusters = document.getElementById('domain-clusters');
+  clusters.innerHTML = '';
+  DATA.domain_matrix.forEach(d => {
+    const covered = Object.entries(d.coverage).filter(([,v]) => v).map(([k]) => k);
+    const notCovered = Object.entries(d.coverage).filter(([,v]) => !v).map(([k]) => k);
+    const section = document.createElement('div');
+    section.className = 'domain-section';
+    section.innerHTML = `
+      <div class="domain-header">
+        <span class="domain-name">${d.domain}</span>
+        <span class="domain-count">${covered.length} institute${covered.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="bubble-row">
+        ${covered.map(c => `<div class="bubble covered"><span class="bubble-dot"></span>${c}</div>`).join('')}
+        ${notCovered.map(c => `<div class="bubble pending"><span class="bubble-dot"></span>${c}</div>`).join('')}
+      </div>
+    `;
+    clusters.appendChild(section);
+  });
+
+  // Institute cards
+  const grid = document.getElementById('institute-grid');
+  grid.innerHTML = '';
+  DATA.institutes.forEach(inst => {
+    const isActive = inst.status === 'Active';
+    grid.innerHTML += `
+      <div class="institute-card ${isActive ? '' : 'pending-card'}">
+        <div class="inst-header">
+          <span class="inst-code">${inst.code}</span>
+          <span class="inst-status ${isActive ? 'active' : 'pending'}">${inst.status}</span>
+        </div>
+        <div class="inst-name">${inst.name}</div>
+        <div class="inst-type">${inst.type}</div>
+        <div class="inst-location">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${inst.location}
+        </div>
+        ${isActive ? `
+        <div class="inst-stats">
+          <div class="inst-stat"><div class="inst-stat-val">${inst.papers}</div><div class="inst-stat-lbl">Papers</div></div>
+          <div class="inst-stat"><div class="inst-stat-val">${inst.spinoffs}</div><div class="inst-stat-lbl">Spinoffs</div></div>
+          <div class="inst-stat"><div class="inst-stat-val">${inst.grants}</div><div class="inst-stat-lbl">Grants</div></div>
+        </div>` : ''}
+        <div class="inst-domains">${inst.domains}</div>
+      </div>
+    `;
+  });
+}
+
+/* ═══ RESEARCH ═══ */
+function renderPapers(papers) {
+  const list = document.getElementById('papers-list');
+  if (!papers.length) {
+    list.innerHTML = '<div class="no-results">No papers match your filters.</div>';
+    return;
+  }
+  list.innerHTML = papers.map(p => `
+    <div class="paper-card">
+      <div class="paper-meta">
+        <span class="paper-tag institute">${p.institute}</span>
+        <span class="paper-tag domain">${p.domain}</span>
+        <span class="paper-tag year">${p.year}</span>
+      </div>
+      <div class="paper-title">
+        <a href="${p.url}" target="_blank" rel="noopener">${p.title}</a>
+      </div>
+      <div class="paper-authors">${p.authors}</div>
+      <div class="paper-venue">${p.venue}</div>
+      <div class="paper-abstract">
+        ${p.abstract}
+        ${p.relevance ? `<div class="paper-relevance">UIV Relevance: ${p.relevance}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterPapers() {
+  const q = document.getElementById('paper-search').value.toLowerCase();
+  const inst = document.getElementById('paper-institute').value;
+  const domain = document.getElementById('paper-domain').value;
+  const filtered = DATA.papers.filter(p => {
+    const matchQ = !q || [p.title, p.authors, p.abstract, p.domain].some(f => f && f.toLowerCase().includes(q));
+    const matchInst = !inst || p.institute === inst;
+    const matchDomain = !domain || p.domain === domain;
+    return matchQ && matchInst && matchDomain;
+  });
+  renderPapers(filtered);
+}
+
+function initResearch() {
+  // Populate domain filter
+  const domains = [...new Set(DATA.papers.map(p => p.domain))].sort();
+  const sel = document.getElementById('paper-domain');
+  domains.forEach(d => { sel.innerHTML += `<option value="${d}">${d}</option>`; });
+  renderPapers(DATA.papers);
+}
+
+/* ═══ GRANTS ═══ */
+function renderGrants(grants) {
+  document.getElementById('grants-grid').innerHTML = grants.map(g => `
+    <div class="grant-card">
+      <div class="grant-header">
+        <div class="grant-name">${g.name}</div>
+        <span class="grant-badge">${g.institute}</span>
+      </div>
+      <div class="grant-amount">${g.amount}</div>
+      <div class="grant-body">
+        <div class="grant-row"><span class="grant-row-label">Issued by</span><span>${g.body}</span></div>
+        <div class="grant-row"><span class="grant-row-label">Eligible</span><span>${g.eligibility}</span></div>
+        <div class="grant-row">
+          <span class="grant-row-label">Deadline</span>
+          <span class="grant-deadline">📅 ${g.deadline}</span>
+        </div>
+      </div>
+      <a class="grant-link" href="${g.url}" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Learn more
+      </a>
+    </div>
+  `).join('');
+}
+
+function filterGrants() {
+  const inst = document.getElementById('grant-institute').value;
+  const filtered = inst ? DATA.grants.filter(g => g.institute === inst) : DATA.grants;
+  renderGrants(filtered);
+}
+
+/* ── Init ── */
+renderSectors();
+initResearch();
+renderGrants(DATA.grants);
+</script>
+
+</body>
+</html>
