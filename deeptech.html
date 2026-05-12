@@ -160,6 +160,43 @@
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 14px;
     }
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(13, 27, 75, 0.45); backdrop-filter: blur(4px);
+      align-items: flex-start; justify-content: center; padding: 60px 20px 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border-radius: 20px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 24px 60px rgba(13,27,75,0.18);
+      width: 100%; max-width: 720px; max-height: 80vh;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 28px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .modal-header h2 { font-size: 1.1rem; font-weight: 900; color: var(--text); }
+    .modal-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .modal-close {
+      width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--border);
+      background: var(--surface2); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 1rem; color: var(--muted);
+      transition: all 0.18s; flex-shrink: 0;
+    }
+    .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+    .modal-body { padding: 24px 28px; overflow-y: auto; flex: 1; }
+    .modal-empty {
+      text-align: center; padding: 40px 0; color: var(--muted); font-size: 0.88rem;
+    }
+
+    /* ── Institute filter bar ── */
+    .inst-filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+
     .institute-card {
       background: var(--surface);
       border: 1.5px solid var(--border);
@@ -168,6 +205,7 @@
       transition: all 0.22s;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
     }
     .institute-card::before {
       content: "";
@@ -373,7 +411,38 @@
     <!-- Institute cards -->
     <div style="margin-top:48px;">
       <div class="page-label" style="margin-bottom:16px;">All Institutes</div>
+      <div class="inst-filter-bar">
+        <select class="filter-select" id="inst-status-filter" onchange="filterInstitutes()">
+          <option value="">All Statuses</option>
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+        </select>
+        <select class="filter-select" id="inst-type-filter" onchange="filterInstitutes()">
+          <option value="">All Types</option>
+          <option value="IIT">IIT</option>
+          <option value="National Lab Network">National Lab Network</option>
+          <option value="Research University">Research University</option>
+          <option value="Defence R&D">Defence R&D</option>
+          <option value="Space Agency">Space Agency</option>
+          <option value="Technology Transfer Organisation">Technology Transfer</option>
+          <option value="Nuclear R&D">Nuclear R&D</option>
+        </select>
+      </div>
       <div class="institute-grid" id="institute-grid"></div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="inst-modal" onclick="closeModal(event)">
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <h2 id="modal-title">Institute</h2>
+            <div class="modal-sub" id="modal-sub"></div>
+          </div>
+          <button class="modal-close" onclick="document.getElementById('inst-modal').classList.remove('open')">✕</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -477,13 +546,17 @@ function renderSectors() {
     clusters.appendChild(section);
   });
 
-  // Institute cards
+  renderInstituteGrid(DATA.institutes);
+}
+
+function renderInstituteGrid(institutes) {
   const grid = document.getElementById('institute-grid');
   grid.innerHTML = '';
-  DATA.institutes.forEach(inst => {
+  institutes.forEach(inst => {
     const isActive = inst.status === 'Active';
+    const hasPapers = DATA.papers.some(p => p.institute === inst.name);
     grid.innerHTML += `
-      <div class="institute-card ${isActive ? '' : 'pending-card'}">
+      <div class="institute-card ${isActive ? '' : 'pending-card'}" onclick="openInstituteModal('${inst.name}')">
         <div class="inst-header">
           <span class="inst-code">${inst.code}</span>
           <span class="inst-status ${isActive ? 'active' : 'pending'}">${inst.status}</span>
@@ -501,9 +574,55 @@ function renderSectors() {
           <div class="inst-stat"><div class="inst-stat-val">${inst.grants}</div><div class="inst-stat-lbl">Grants</div></div>
         </div>` : ''}
         <div class="inst-domains">${inst.domains}</div>
+        <div style="margin-top:10px;font-size:0.72rem;color:var(--accent-blue);font-weight:700;">${hasPapers ? '→ Click to view papers' : isActive ? '→ Click to view details' : ''}</div>
       </div>
     `;
   });
+}
+
+function filterInstitutes() {
+  const status = document.getElementById('inst-status-filter').value;
+  const type = document.getElementById('inst-type-filter').value;
+  const filtered = DATA.institutes.filter(i => {
+    const matchStatus = !status || i.status === status;
+    const matchType = !type || i.type === type;
+    return matchStatus && matchType;
+  });
+  renderInstituteGrid(filtered);
+}
+
+function openInstituteModal(instName) {
+  const inst = DATA.institutes.find(i => i.name === instName);
+  const papers = DATA.papers.filter(p => p.institute === instName);
+  document.getElementById('modal-title').textContent = instName;
+  document.getElementById('modal-sub').textContent = inst.type + ' · ' + inst.location;
+  const body = document.getElementById('modal-body');
+  if (!papers.length) {
+    body.innerHTML = '<div class="modal-empty">No papers in the database yet for this institute.<br>Data is pending collection.</div>';
+  } else {
+    body.innerHTML = papers.map(p => `
+      <div class="paper-card" style="margin-bottom:14px;">
+        <div class="paper-meta">
+          <span class="paper-tag domain">${p.domain}</span>
+          <span class="paper-tag year">${p.year}</span>
+        </div>
+        <div class="paper-title"><a href="${p.url}" target="_blank" rel="noopener">${p.title}</a></div>
+        <div class="paper-authors">${p.authors}</div>
+        <div class="paper-venue">${p.venue}</div>
+        <div class="paper-abstract">
+          ${p.abstract}
+          ${p.relevance ? `<div class="paper-relevance">UIV Relevance: ${p.relevance}</div>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+  document.getElementById('inst-modal').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('inst-modal')) {
+    document.getElementById('inst-modal').classList.remove('open');
+  }
 }
 
 /* ═══ RESEARCH ═══ */
